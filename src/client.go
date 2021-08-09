@@ -2,12 +2,14 @@ package dbm
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/gofrs/uuid"
 
+	// "entity"
+	"github.com/ytsiuryn/ds-audiodbm/src/entity"
 	md "github.com/ytsiuryn/ds-audiomd"
 	srv "github.com/ytsiuryn/ds-microservice"
-	"github.com/ytsiuryn/ds-audiodbm/entity"
 )
 
 // AudioDBRequest описывает структуру пакета запроса к сервису.
@@ -23,9 +25,15 @@ type AudioDBRequest struct {
 	BadSuggestions []*entity.BadSuggestion `json:"bad_suggestions,omitempty"`
 	Actors         []*entity.Actor         `json:"actors,omitempty"`
 	Pictures       []*entity.Picture       `json:"pictures,omitempty"`
-	Error          srv.ErrorResponse       `json:"error,omitempty"`
 }
 
+// AudioDBResponse описывает структуру ответа
+type AudioDBResponse struct {
+	*AudioDBRequest
+	Error *srv.ErrorResponse `json:"error,omitempty"`
+}
+
+// NewAudioDBRequest создает объект запроса.
 func NewAudioDBRequest(cmd string, entry *entity.AlbumEntry) *AudioDBRequest {
 	return &AudioDBRequest{Cmd: cmd, Entry: entry}
 }
@@ -50,6 +58,7 @@ func (req *AudioDBRequest) ImportAssumption(assumption *md.Assumption) (err erro
 	return
 }
 
+// ImportSuggestions обрабатывает предложения по Entry, формируя из них данные для запроса.
 func (req *AudioDBRequest) ImportSuggestions(set *md.SuggestionSet) error {
 	req.clearSuggestionsMetadata()
 
@@ -152,9 +161,18 @@ func (req *AudioDBRequest) clearActorWithMask(mask entity.EntityMask) {
 	}
 }
 
+// MustBeOK контроллирует значение ответа микросервиса, и, в случае ошибки,
+// печатает сведения об ошибке и останавливает процесс с запущенным клиентом.
+func (resp *AudioDBResponse) Unwrap() *AudioDBRequest {
+	if resp.Error != nil {
+		srv.FailOnError(errors.New(resp.Error.Error), resp.Error.Context)
+	}
+	return resp.AudioDBRequest
+}
+
 // ParseAnswer разбирает JSON ответа и импортирует данные в объект `AudioDBRequest`.
-func ParseAnswer(data []byte) (_ *AudioDBRequest, err error) {
-	entry := AudioDBRequest{}
+func ParseAnswer(data []byte) (_ *AudioDBResponse, err error) {
+	entry := AudioDBResponse{}
 	if err = json.Unmarshal(data, &entry); err != nil {
 		return
 	}

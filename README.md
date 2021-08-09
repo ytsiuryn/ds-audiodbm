@@ -1,4 +1,4 @@
-# ds-dbm #
+# ds-audiodbm #
 
 Микросервис работы с метаданными аудио-объектов, представленных в БД. Обмен сообщениями с микросервисом реализован с использованием [RabbitMQ](https://www.rabbitmq.com).
 
@@ -13,4 +13,12 @@
 |delete_entry      |удаление данных о каталоге        |{"cmd":"delete_entry","entry":{"id":123}}|эхо-ответ|
 |finalyze_entry    |финализация каталога              |{"cmd":"finalyze_entry","entry":{"id":123}}|{"cmd":"finalyze_entry","entry":{"id":123,"status":"finalyzed"}}|
 |rename_entry      |переименование каталога альбома   |{"cmd":"rename_entry","new_path":<new_path>,"entry":{"path":<old_path>}}|эхо-ответ
+---
+
+## Системные переменные для проведения тестов
+
+---
+|Переменная|Значение|
+|----------|--------|
+|DS_DB_URL |строка подключения к БД|
 ---

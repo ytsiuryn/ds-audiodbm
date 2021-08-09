@@ -14,13 +14,15 @@ import (
 	"github.com/pkg/errors"
 	"github.com/streadway/amqp"
 
-	"github.com/ytsiuryn/ds-audiodbm/entity"
+	"github.com/ytsiuryn/ds-audiodbm/src/entity"
 	srv "github.com/ytsiuryn/ds-microservice"
 	"github.com/ytsiuryn/go-collection"
 )
 
-// Описание сервиса
-const ServiceName = "dbmaudio"
+// Константы сервиса
+const (
+	ServiceName = "dbmaudio"
+)
 
 // Dbm описывает внутреннее состояние клиента Discogs.
 type Dbm struct {
@@ -47,8 +49,8 @@ func New(dbURL string) *Dbm {
 // AnswerWithError заполняет структуру ответа информацией об ошибке.
 func (m *Dbm) AnswerWithError(delivery *amqp.Delivery, err error, context string) {
 	m.LogOnError(err, context)
-	req := &AudioDBRequest{
-		Error: srv.ErrorResponse{
+	req := &AudioDBResponse{
+		Error: &srv.ErrorResponse{
 			Error:   err.Error(),
 			Context: context,
 		},
@@ -60,7 +62,7 @@ func (m *Dbm) AnswerWithError(delivery *amqp.Delivery, err error, context string
 	m.Answer(delivery, data)
 }
 
-// Контролирует сигнал завершения цикла и последующего освобождения ресурсов микросервиса.
+// Start запускает осноной цикл обработки команд запроса.
 func (m *Dbm) Start(msgs <-chan amqp.Delivery) {
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
