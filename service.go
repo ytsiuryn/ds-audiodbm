@@ -14,9 +14,22 @@ import (
 	"github.com/pkg/errors"
 	"github.com/streadway/amqp"
 
-	"github.com/ytsiuryn/ds-audiodbm/src/entity"
+	"github.com/ytsiuryn/ds-audiodbm/entity"
 	srv "github.com/ytsiuryn/ds-microservice"
 	"github.com/ytsiuryn/go-collection"
+)
+
+// ConnType описывает перечисление типов соединений.
+type ConnType string
+
+func (ct ConnType) String() string {
+	return string(ct)
+}
+
+// Допустимые типы соединений
+const (
+	NormalConnType      = ConnType("db")
+	TransactionConnType = ConnType("tx")
 )
 
 // Константы сервиса
@@ -40,15 +53,14 @@ func New(dbURL string) *Dbm {
 		dbm.Log.Fatalln(err)
 	}
 
-	dbm.conn = conn
-	dbm.ctx = context.WithValue(context.Background(), "db", dbm.conn)
+	dbm.ctx = context.WithValue(context.Background(), NormalConnType, conn)
 
 	return dbm
 }
 
 // AnswerWithError заполняет структуру ответа информацией об ошибке.
 func (m *Dbm) AnswerWithError(delivery *amqp.Delivery, err error, context string) {
-	m.LogOnError(err, context)
+	m.LogOnErrorWithContext(err, context)
 	req := &AudioDBResponse{
 		Error: &srv.ErrorResponse{
 			Error:   err.Error(),
@@ -56,14 +68,14 @@ func (m *Dbm) AnswerWithError(delivery *amqp.Delivery, err error, context string
 		},
 	}
 	data, err := json.Marshal(req)
-	if err != nil {
-		srv.FailOnError(err, "Answer marshalling error")
-	}
+	srv.FailOnError(err, "Answer marshalling")
 	m.Answer(delivery, data)
 }
 
-// Start запускает осноной цикл обработки команд запроса.
-func (m *Dbm) Start(msgs <-chan amqp.Delivery) {
+// StartWithConnection запускает осноной цикл обработки команд запроса.
+func (m *Dbm) StartWithConnection(connstr string) {
+	msgs := m.Service.ConnectToMessageBroker(connstr)
+
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
@@ -161,7 +173,7 @@ func (m *Dbm) setEntry(req *AudioDBRequest) (_ []byte, err error) {
 		return
 	}
 	defer m.completeTx(tx, err)
-	txctx := context.WithValue(m.ctx, "tx", tx)
+	txctx := context.WithValue(m.ctx, TransactionConnType, tx)
 	req.Entry.LastModified = req.Entry.LastModified.UTC()
 	if req.Entry.ID == 0 {
 		err = req.Entry.Create(txctx)
@@ -202,7 +214,7 @@ func (m *Dbm) deleteEntry(req *AudioDBRequest) (_ []byte, err error) {
 			return
 		}
 	}
-	txctx := context.WithValue(m.ctx, "tx", tx)
+	txctx := context.WithValue(m.ctx, TransactionConnType, tx)
 	if err = entity.DeleteEntryPictures(txctx, req.Entry.ID); err != nil {
 		return
 	}
@@ -239,7 +251,7 @@ func (m *Dbm) finalyzeEntry(req *AudioDBRequest) (_ []byte, err error) {
 		return
 	}
 	defer m.completeTx(tx, err)
-	txctx := context.WithValue(m.ctx, "tx", tx)
+	txctx := context.WithValue(m.ctx, TransactionConnType, tx)
 
 	if err = entity.DeleteEntrySuggestions(txctx, req.Entry.ID); err != nil {
 		return
@@ -275,7 +287,7 @@ func (m *Dbm) renameEntry(req *AudioDBRequest) (_ []byte, err error) {
 	}
 
 	entry.Path = req.NewPath
-	err = entry.Update(context.WithValue(m.ctx, "tx", tx))
+	err = entry.Update(context.WithValue(m.ctx, TransactionConnType, tx))
 	if err != nil {
 		return
 	}

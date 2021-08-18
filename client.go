@@ -6,8 +6,7 @@ import (
 
 	"github.com/gofrs/uuid"
 
-	// "entity"
-	"github.com/ytsiuryn/ds-audiodbm/src/entity"
+	"github.com/ytsiuryn/ds-audiodbm/entity"
 	md "github.com/ytsiuryn/ds-audiomd"
 	srv "github.com/ytsiuryn/ds-microservice"
 )

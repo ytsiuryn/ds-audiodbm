@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ytsiuryn/ds-audiodbm/src/entity"
+	"github.com/ytsiuryn/ds-audiodbm/entity"
 	md "github.com/ytsiuryn/ds-audiomd"
 	srv "github.com/ytsiuryn/ds-microservice"
 )
@@ -23,7 +23,7 @@ func TestDbmService(t *testing.T) {
 	req := NewAudioDBRequest("delete_entry", &entity.AlbumEntry{Path: "test"})
 	requestAnswer(t, cl, req)
 
-	data, err := ioutil.ReadFile("../testdata/test_assumption.json")
+	data, err := ioutil.ReadFile("testdata/test_assumption.json")
 	require.NoError(t, err)
 	testAssumption := md.NewAssumption(nil)
 	require.NoError(t, json.Unmarshal(data, &testAssumption))
@@ -107,7 +107,6 @@ func requestAnswer(t *testing.T, cl *srv.RPCClient, req *AudioDBRequest) *AudioD
 
 func startTestService() {
 	testService := New(os.Getenv("DS_DB_URL"))
-	msgs := testService.ConnectToMessageBroker("amqp://guest:guest@localhost:5672/")
 	testService.Log.SetLevel(log.DebugLevel)
-	go testService.Start(msgs)
+	go testService.StartWithConnection("amqp://guest:guest@localhost:5672/")
 }

@@ -107,6 +107,7 @@ github.com/streadway/amqp v1.0.0 h1:kuuDrUJFZL1QYL9hUNuCxNObNzB0bV/ZG5jV3RWAQgo=
 github.com/streadway/amqp v1.0.0/go.mod h1:AZpEONHx3DKn8O/DFsRAY58/XVQiIPMTMB1SddzLXVw=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
+github.com/stretchr/objx v0.2.0 h1:Hbg2NidpLE8veEBkEZTL3CvlkUIVzuU9jDplZO54c48=
 github.com/stretchr/objx v0.2.0/go.mod h1:qt09Ya8vawLte6SNmTgCsAVtYtaKzEcn8ATUoHMkEqE=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
@@ -118,6 +119,8 @@ github.com/ytsiuryn/ds-audiomd v0.3.0 h1:fzoYdDKyWW5aExBH44tHKJmHP9XXUJMltO0FoJc
 github.com/ytsiuryn/ds-audiomd v0.3.0/go.mod h1:MVhMw/IHJIjYJFPTK5GLspxLkaf2UMX7WfcE0yzBOGU=
 github.com/ytsiuryn/ds-microservice v0.7.6 h1:B1Yp6tD0g585J0uSrp2DMkZmpV99VGJZgOURfgCO/HY=
 github.com/ytsiuryn/ds-microservice v0.7.6/go.mod h1:rlQik/5GuhdSWCZMgn8+XfQ0Td3ee0GWFT8qifKTPyk=
+github.com/ytsiuryn/ds-microservice v0.8.2 h1:FZbWUudU+19OhjparPKwmoPbDxn6LwK1vTnyz3M1yG4=
+github.com/ytsiuryn/ds-microservice v0.8.2/go.mod h1:WUMWVggqePYM8NyPpM8omHSMlSGorZ9GNaQtL7A4uqM=
 github.com/ytsiuryn/go-collection v0.0.2 h1:/i09VVKL4HJPu+VEdmdIQaYX36Fxm+ltvNVdhlEyjEo=
 github.com/ytsiuryn/go-collection v0.0.2/go.mod h1:nPgGjU7QxWPoHjd88rJT51/SKHJzJFVHbCNFr3XxY7w=
 github.com/ytsiuryn/go-intutils v0.0.2 h1:r2nV3r6TnhGrezcvtfryNkN6mUpAfRo99hvbhwBKo90=
